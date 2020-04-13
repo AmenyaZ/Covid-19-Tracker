@@ -8,8 +8,10 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.ContextMenu
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -20,6 +22,7 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.kanyideveloper.covid_19tracker.R
 import com.shashank.sony.fancydialoglib.FancyAlertDialog
 import com.shashank.sony.fancydialoglib.Icon
@@ -32,6 +35,7 @@ class ContentActivity : AppCompatActivity() {
     private lateinit var adapter: RecyclerViewAdapter
     private lateinit var statisticsList: ArrayList<StatisticsList>
     lateinit var editTextSearch: EditText
+    lateinit var floatingActionButtonMore:FloatingActionButton
 
     private val URL = "https://corona.lmao.ninja/countries"
 
@@ -45,6 +49,7 @@ class ContentActivity : AppCompatActivity() {
 
         editTextSearch = findViewById(R.id.searchEdittext)
         recyclerView = findViewById(R.id.recyclerView)
+        floatingActionButtonMore = findViewById(R.id.floatingActionButtonMore)
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = LinearLayoutManager(this)
         statisticsList = ArrayList()
@@ -57,7 +62,44 @@ class ContentActivity : AppCompatActivity() {
             }
         })
 
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (dy > 0 && floatingActionButtonMore.visibility == View.VISIBLE) {
+                    floatingActionButtonMore.hide()
+                } else if (dy < 0 && floatingActionButtonMore.visibility != View.VISIBLE) {
+                    floatingActionButtonMore.show()
+                }
+            }
+        })
+
         getMyData()
+
+        registerForContextMenu(floatingActionButtonMore)
+    }
+
+    override fun onCreateContextMenu(
+            menu: ContextMenu,
+            v: View,
+            menuInfo: ContextMenu.ContextMenuInfo?
+    ) {
+        super.onCreateContextMenu(menu, v, menuInfo)
+        menuInflater.inflate(R.menu.context_menu, menu)
+    }
+
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_daily -> {
+
+            }
+            R.id.action_global->{
+
+            }
+            R.id.action_total->{
+
+            }
+        }
+        return true
     }
 
     fun filter(e: String) {
